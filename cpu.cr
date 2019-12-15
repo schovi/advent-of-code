@@ -12,7 +12,7 @@ def write_value(memory, cursor, parameter, value)
   memory[memory[cursor + parameter]] = value
 end
 
-def run(memory, prompt)
+def run(memory, prompt = [] of Int32)
   puts "program starts:"
 
   memory = memory.split(',').map(&.to_i)
@@ -91,4 +91,6 @@ def run(memory, prompt)
       raise "unknown opcode #{opcode} at #{cursor} instruction #{instruction}"
     end
   end
+
+  memory
 end
