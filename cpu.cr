@@ -13,9 +13,8 @@ def write_value(memory, cursor, parameter, value)
 end
 
 def run(memory, prompt = [] of Int32)
-  puts "program starts:"
-
   memory = memory.split(',').map(&.to_i)
+  output = [] of Int32
   cursor = 0
 
   while
@@ -54,7 +53,7 @@ def run(memory, prompt = [] of Int32)
       cursor += 2
     when 4
       # Print output
-      puts read_value(memory, cursor, 1, modes)
+      output << read_value(memory, cursor, 1, modes)
 
       cursor += 2
     when 5 # jump-if-true
@@ -92,5 +91,5 @@ def run(memory, prompt = [] of Int32)
     end
   end
 
-  memory
+  return memory, output
 end
