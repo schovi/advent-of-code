@@ -12,7 +12,7 @@ def write_value(memory, cursor, parameter, value)
   memory[memory[cursor + parameter]] = value
 end
 
-def run(memory, prompt = [] of Int32)
+def run(memory, prompt = [] of Int32, debug = false)
   memory = memory.split(',').map(&.to_i)
   output = [] of Int32
   cursor = 0
