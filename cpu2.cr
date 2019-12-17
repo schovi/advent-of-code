@@ -1,16 +1,26 @@
-alias Input  = Channel(Int32)
-alias Output = Channel(Int32)
+alias Input  = Channel(Int64)
+alias Output = Channel(Int64)
 
 class Program
-  property memory : Array(Int32)
-  getter cursor = 0
+  getter memory : Array(Int64)
+
+  getter cursor : Int64         = 0
+  getter relative_base : Int64  = 0
+
   getter input  = Input.new
   getter output = Output.new
+
   getter name
 
-  def initialize(program : String, @name : String)
-    @memory = program.split(',').map(&.to_i)
+  def initialize(program : String, @name : String | Nil = nil)
+    chars = program.split(',')
 
+    # 1024 is empty working space in memory
+    @memory = Array(Int64).new(chars.size + 1024, 0)
+
+    chars.each_with_index do |value, i |
+      @memory[i] = value.to_i64
+    end
   end
 
   def read
@@ -32,6 +42,7 @@ class Program
     spawn do
       while
         instruction = memory[cursor]
+
         opcode      = instruction % 100
         parsed      = instruction.to_s.chars
         modes       = {
@@ -44,17 +55,17 @@ class Program
         case opcode
         when 1
           value = read_parameter(1, modes) + read_parameter(2, modes)
-          write_parameter(3, value)
+          write_parameter(3, value, modes)
 
           @cursor += 4
         when 2
 
           value = read_parameter(1, modes) * read_parameter(2, modes)
-          write_parameter(3, value)
+          write_parameter(3, value, modes)
 
           @cursor += 4
         when 3
-          write_parameter(1, input.receive)
+          write_parameter(1, input.receive, modes)
 
           @cursor += 2
         when 4
@@ -75,20 +86,24 @@ class Program
           end
         when 7 # less than
           if read_parameter(1, modes) < read_parameter(2, modes)
-            write_parameter(3, 1)
+            write_parameter(3, 1_i64, modes)
           else
-            write_parameter(3, 0)
+            write_parameter(3, 0_i64, modes)
           end
 
           @cursor += 4
         when 8 # equals
           if read_parameter(1, modes) == read_parameter(2, modes)
-            write_parameter(3, 1)
+            write_parameter(3, 1_i64, modes)
           else
-            write_parameter(3, 0)
+            write_parameter(3, 0_i64, modes)
           end
 
           @cursor += 4
+        when 9 # adjust relative base
+          @relative_base += read_parameter(1, modes)
+
+          @cursor += 2
         when 99
           output.close
 
@@ -100,21 +115,31 @@ class Program
     end
   end
 
-  def read_parameter(parameter, modes)
-    position = memory[cursor + parameter]
+  def read_parameter(index, modes)
+    parameter = memory[cursor + index]
 
-    if modes[parameter] == '0'
-      memory[position]
+    case modes[index]
+    when '0'
+      memory[parameter]
+    when '1'
+      parameter
+    when '2'
+      memory[parameter + relative_base]
     else
-      position
+      raise "Invalid mode"
     end
   end
 
-  def write_parameter(parameter, value)
-    memory[memory[cursor + parameter]] = value
-  end
+  def write_parameter(index, value, modes)
+    parameter = memory[cursor + index]
 
-  def initialize_memory(input : String)
-    input.split(',').map(&.to_i)
+    case modes[index]
+    when '0'
+      memory[parameter] = value
+    when '2'
+      memory[parameter + relative_base] = value
+    else
+      raise "Invalid mode"
+    end
   end
 end
