@@ -1,8 +1,14 @@
 module Common where
 
-import System.IO.Unsafe
+import System.IO.Unsafe ( unsafePerformIO )
 
-readInput file = lines $ unsafePerformIO . readFile $ file
+readLines :: FilePath -> [String]
+readLines file = lines $ unsafePerformIO . readFile $ file
 
 readNumbers :: FilePath -> [Integer]
-readNumbers file = map read $ readInput file
+readNumbers file = map read $ readLines file
+
+split :: Char -> String -> [String]
+split c xs = case break (==c) xs of
+  (ls, "") -> [ls]
+  (ls, _:rs) -> ls : split c rs
