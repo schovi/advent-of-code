@@ -8,9 +8,9 @@ readLines file = lines $ unsafePerformIO . readFile $ file
 readNumbers :: FilePath -> [Integer]
 readNumbers file = map read $ readLines file
 
-split :: Char -> String -> [String]
+split :: (Eq a) => a -> [a] -> [[a]]
 split c xs = case break (==c) xs of
-  (ls, "") -> [ls]
+  (ls, []) -> [ls]
   (ls, _:rs) -> ls : split c rs
 
 takeEvery :: [a] -> Int -> [a]
