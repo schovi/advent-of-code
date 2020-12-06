@@ -17,3 +17,7 @@ takeEvery :: [a] -> Int -> [a]
 takeEvery xs n = case drop (n-1) xs of
                       (y:ys) -> y : takeEvery ys n
                       [] -> []
+
+unique :: Eq a => [a] -> [a]
+unique (x:xs) = if x `elem` xs then unique xs else x : unique xs
+unique xs     = xs
