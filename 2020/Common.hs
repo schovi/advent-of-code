@@ -5,6 +5,9 @@ import System.IO.Unsafe ( unsafePerformIO )
 readLines :: FilePath -> [String]
 readLines file = lines $ unsafePerformIO . readFile $ file
 
+readWords :: FilePath -> [[String]]
+readWords file = map words $ readLines file
+
 readNumbers :: FilePath -> [Integer]
 readNumbers file = map read $ readLines file
 
