@@ -11,6 +11,9 @@ readWords file = map words $ readLines file
 readNumbers :: FilePath -> [Integer]
 readNumbers file = map read $ readLines file
 
+readInt :: FilePath -> [Int]
+readInt file = map read $ readLines file
+
 split :: (Eq a) => a -> [a] -> [[a]]
 split c xs = case break (==c) xs of
   (ls, []) -> [ls]
