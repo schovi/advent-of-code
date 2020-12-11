@@ -27,3 +27,10 @@ takeEvery xs n = case drop (n-1) xs of
 unique :: Eq a => [a] -> [a]
 unique (x:xs) = if x `elem` xs then unique xs else x : unique xs
 unique xs     = xs
+
+imap :: (Int -> a -> a) -> [a] -> [a]
+imap f = zipWith (curry mapper) [0..]
+  where mapper (i, x) = f i x
+
+getByindex :: Int -> [a] -> Maybe a
+getByindex x xs = if x >= 0 && x < length xs then Just (xs !! x) else Nothing
