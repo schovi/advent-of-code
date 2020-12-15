@@ -28,7 +28,7 @@ unique :: Eq a => [a] -> [a]
 unique (x:xs) = if x `elem` xs then unique xs else x : unique xs
 unique xs     = xs
 
-imap :: (Int -> a -> a) -> [a] -> [a]
+-- imap :: (Int -> a -> a) -> [a] -> [a]
 imap f = zipWith (curry mapper) [0..]
   where mapper (i, x) = f i x
 
