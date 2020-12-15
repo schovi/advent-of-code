@@ -1,6 +1,6 @@
 
 import Common
--- import Data.List (elemIndex)
+import Data.List (find)
 
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -8,11 +8,11 @@ import qualified Data.Map as Map
 main :: IO ()
 main = do
   print "Test:"
-  let result = solution 4 $ readInt "inputs/15.test.input"
+  let result = solution 2020 $ readInt "inputs/15.test.input"
   print result
 
   print "Regular:"
-  let result = solution 3 $ readInt "inputs/15.input"
+  let result = solution 2020 $ readInt "inputs/15.input"
   print result
 
   print "Bonus test:"
@@ -24,31 +24,27 @@ main = do
   print result
 
 type Input = [Int]
-type Cache = Map Int [Int]
+type Cache = Map Int Int
 
-type FolderResult = (Int, Cache)
+type State = (Cache, Int, Int)
 
 solution :: Int -> Input -> Int
-solution max input = fst result
-  where result         = foldl folder (last input, inputToMap input) iterations
-        iteration      = length input + 1
-        iterations     = [iteration..max]
+solution iterations input = case result of Just (_, number, _) -> number
+                                           Nothing             -> error "boom"
+  where result = find predicate $ iterate nextState initialState
+        initialState   = (inputToState input, last input, length input + 1)
+        predicate (_, _, iteration) = iteration > iterations
 
-inputToMap :: [Int] -> Cache
-inputToMap input = Map.fromList $ imap (\i x -> (x, [i+1])) input
+inputToState :: [Int] -> Cache
+inputToState input = Map.fromList $ zip input [1..]
 
-folder :: FolderResult -> Int -> FolderResult
-folder (number, cache) iteration = (nextNumber, nextCache)
-  where nextNumber = getNext number cache
-        nextCache  = Map.alter (adjustItem iteration) nextNumber cache
+nextState :: State -> State
+nextState (cache, number, iteration) = (nextCache, nextNumber, iteration + 1)
+  where nextNumber = case Map.lookup number cache of (Just value) -> (iteration - 1) - value
+                                                     Nothing      -> 0
+        nextCache  = Map.insert number (iteration - 1) cache
 
-adjustItem :: a -> Maybe [a] -> Maybe [a]
-adjustItem iteration Nothing         = Just [iteration]
-adjustItem iteration (Just (last:_)) = Just [iteration, last]
-adjustItem _ _                       = error "boom 2"
-
-getNext :: Int -> Cache -> Int
-getNext number cache = let value = Map.lookup number cache
-                       in case value of (Just [_])           -> 0
-                                        (Just (last:prev:_)) -> last - prev
-                                        _                    -> error "boom 1"
+getNext :: Int -> Int -> Cache -> Int
+getNext number iteration cache = let value = Map.lookup number cache
+                                 in case value of (Just value) -> (iteration - 1) - value
+                                                  Nothing      -> 0
