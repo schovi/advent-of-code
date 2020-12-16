@@ -31,7 +31,7 @@ type State = (Cache, Int, Int)
 solution :: Int -> Input -> Int
 solution iterations input = case result of Just (_, number, _) -> number
                                            Nothing             -> error "boom"
-  where result = find predicate $ iterate nextState initialState
+  where result = find predicate $ iterate nextState initialState
         initialState   = (inputToState input, last input, length input + 1)
         predicate (_, _, iteration) = iteration > iterations
 
