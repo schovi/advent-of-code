@@ -40,10 +40,6 @@ lexer (' ' : restStr) = lexer restStr
 lexer str             = IntTok (read digitStr) : lexer restStr
                         where (digitStr, restStr) = span isDigit str
 
-isDigit :: Char -> Bool
-isDigit = (`elem` ['0'..'9'])
-
-
 calculate :: [Token] -> Int
 calculate = calculate' [] []
 

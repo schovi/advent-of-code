@@ -38,3 +38,6 @@ imap f = zipWith (curry mapper) [0..]
 
 getByindex :: Int -> [a] -> Maybe a
 getByindex x xs = if x >= 0 && x < length xs then Just (xs !! x) else Nothing
+
+isDigit :: Char -> Bool
+isDigit = (`elem` ['0'..'9'])
