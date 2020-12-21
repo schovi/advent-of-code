@@ -41,3 +41,5 @@ getByindex x xs = if x >= 0 && x < length xs then Just (xs !! x) else Nothing
 
 isDigit :: Char -> Bool
 isDigit = (`elem` ['0'..'9'])
+
+reject f = filter (not . f)
