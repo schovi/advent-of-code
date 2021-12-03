@@ -1,9 +1,13 @@
 module Common where
 
 import System.IO.Unsafe ( unsafePerformIO )
+import Data.Char (digitToInt)
 
 readLines :: FilePath -> [String]
 readLines file = lines $ unsafePerformIO . readFile $ file
+
+readBits :: FilePath -> [[Int]]
+readBits file = map (map digitToInt) $ readLines file
 
 readWords :: FilePath -> [[String]]
 readWords file = map words $ readLines file
