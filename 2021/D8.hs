@@ -59,12 +59,7 @@ digitSegments = Map.fromList [
                              ]
 
 emptySegments = Map.fromList (map (, []) ['a'..'g'])
-
 originalMapping = patternsToSegmentsMap $ Map.keys digitSegments
-
-segmentToDigits = Map.foldrWithKey mapFolder emptySegments digitSegments
-  where mapFolder segments digit newMap = foldl (folder digit) newMap segments
-        folder digit newMap segment = Map.adjust (digit:) segment newMap
 
 decodeLine :: NoteLine -> Int
 decodeLine (patterns, digits) = read $ map (\digit -> head . show $ digitSegments Map.! (mapping Map.! digit)) digits
